@@ -4,5 +4,5 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - fastqc=0.11.7
+  - subread=1.6.1
   - multiqc=1.5
