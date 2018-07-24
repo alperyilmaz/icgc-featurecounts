@@ -5,7 +5,7 @@
 ========================================================================================
  ICGC-FeatureCounts Analysis Pipeline. Started 2018-07-19.
  #### Homepage / Documentation
- https://github.com/apeltzer/ICGC-FeatureCounts
+ https://github.com/apeltzer/nf-icgc-featureCounts
  #### Authors
  Alexander Peltzer apeltzer <alexander.peltzer@qbic.uni-tuebingen.de> - https://github.com/apeltzer>
 ----------------------------------------------------------------------------------------
@@ -21,21 +21,15 @@ def helpMessage() {
 
     The typical command for running the pipeline is as follows:
 
-    nextflow run ICGC-FeatureCounts --reads '*_R{1,2}.fastq.gz' -profile docker
+    nextflow run nf-icgc-featureCounts --manifest 'manifest.tsv' --gtf human.grch37.gtf -profile docker
 
     Mandatory arguments:
-      --reads                       Path to input data (must be surrounded with quotes)
-      --genome                      Name of iGenomes reference
-      -profile                      Hardware config to use. docker / aws
-
-    Options:
-      --singleEnd                   Specifies that the input is single end reads
-
-    References                      If not specified in the configuration file or you wish to overwrite any of the references.
-      --fasta                       Path to Fasta reference
+      --manifest                    Path to manifest file as created from ICGC DCC Portal
+      --gtf                         GTF file for featureCounts
+      -profile                      Hardware config to use, e.g. docker / aws
 
     Other options:
-      --outdir                      The output directory where the results will be saved
+      --outdir                      The output directory where the results will be saved. Must be an S3 bucket on AWS Region used by ICGC (Virginia).
       --email                       Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits
       -name                         Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
     """.stripIndent()
@@ -53,7 +47,9 @@ if (params.help){
 
 // Configurable variables
 params.name = false
-params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
+params.fasta = false
+params.gtf = false
+params.manifest = false
 params.multiqc_config = "$baseDir/conf/multiqc_config.yaml"
 params.email = false
 params.plaintext_email = false
@@ -81,29 +77,7 @@ if( !(workflow.runName ==~ /[a-z]+_[a-z]+/) ){
   custom_runName = workflow.runName
 }
 
-/*
- * Create a channel for input read files
- */
- if(params.readPaths){
-     if(params.singleEnd){
-         Channel
-             .from(params.readPaths)
-             .map { row -> [ row[0], [file(row[1][0])]] }
-             .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied" }
-             .into { read_files_fastqc; read_files_trimming }
-     } else {
-         Channel
-             .from(params.readPaths)
-             .map { row -> [ row[0], [file(row[1][0]), file(row[1][1])]] }
-             .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied" }
-             .into { read_files_fastqc; read_files_trimming }
-     }
- } else {
-     Channel
-         .fromFilePairs( params.reads, size: params.singleEnd ? 1 : 2 )
-         .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nIf this is single-end data, please specify --singleEnd on the command line." }
-         .into { read_files_fastqc; read_files_trimming }
- }
+
 
 
 // Header log info
@@ -180,7 +154,7 @@ process get_software_versions {
 * repo_code	file_id	object_id	file_format	file_name	file_size	md5_sum	index_object_id	donor_id/donor_count	project_id/project_count	study
 * We'd need to access the object_id and probably take the file_name with us too ,-) 
 */
-file_manifest = file(${params}.manifest)
+file_manifest = file("${params}.manifest")
 
 crypted_object_ids = Channel
                    .from(file_manifest)
