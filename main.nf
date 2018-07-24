@@ -26,6 +26,12 @@ def helpMessage() {
     Mandatory arguments:
       --manifest                    Path to manifest file as created from ICGC DCC Portal
       --gtf                         GTF file for featureCounts
+
+      Strandedness:
+      --forward_stranded            The library is forward stranded
+      --reverse_stranded            The library is reverse stranded
+      --unstranded                  The default behaviour
+
       -profile                      Hardware config to use, e.g. docker / aws
 
     Other options:
@@ -53,6 +59,10 @@ params.manifest = false
 params.multiqc_config = "$baseDir/conf/multiqc_config.yaml"
 params.email = false
 params.plaintext_email = false
+
+forward_stranded = params.forward_stranded
+reverse_stranded = params.reverse_stranded
+unstranded = params.unstranded
 
 multiqc_config = file(params.multiqc_config)
 output_docs = file("$baseDir/docs/output.md")
@@ -174,7 +184,7 @@ process fetch_encrypted_s3_url {
 
     script:
     """
-    score-client url --object-id $id
+    score-client url --object-id $id | grep -e "^https:\/\/\S*"
     """
 }
 
