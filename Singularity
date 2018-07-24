@@ -4,7 +4,7 @@ Bootstrap:docker
 %labels
     MAINTAINER Alexander Peltzer <alexander.peltzer@qbic.uni-tuebingen.de>
     DESCRIPTION Singularity image containing all requirements for ICGC-FeatureCounts pipeline
-    VERSION 1.0.0
+    VERSION 1.0.0dev
 
 %files
     environment.yml /
