@@ -155,20 +155,19 @@ process get_software_versions {
 */
 file_manifest = file("${params}.manifest")
 
-crypted_object_ids = Channel
-                   .from(file_manifest)
-                   .splitCsv(header: true, sep="\t")
-                   .view { row -> "${row.object_id}" }
-
+Channel.from(file_manifest)
+       .splitCsv(header: true, sep="\t")
+       .map { row -> tuple("${row.file_name}", "${row.object_id}")}
+       .set (crypted_object_ids)
 
 /*
  * STEP 0 - ICGC Score Client to get S3 URL
  */
 process fetch_encrypted_s3_url {
-    tag "$id"
+    tag "$file_name"
     
     input:
-    val id from crypted_object_ids
+    set file_name, id from crypted_object_ids
 
     output:
     stdout into s3_url
@@ -184,11 +183,40 @@ process fetch_encrypted_s3_url {
 */
 
 process featureCounts{
+    tag "${bam_featurecounts.baseName - '.sorted'}"
+    publishDir "${params.outdir}/featureCounts", mode: 'copy',
+        saveAs: {filename ->
+            if (filename.indexOf("biotype_counts") > 0) "biotype_counts/$filename"
+            else if (filename.indexOf("_gene.featureCounts.txt.summary") > 0) "gene_count_summaries/$filename"
+            else if (filename.indexOf("_gene.featureCounts.txt") > 0) "gene_counts/$filename"
+            else "$filename"
+        }
 
     input:
     val sc_stdout from s3_url
+    file gtf from gtf_featureCounts.collect()
+    file biotypes_header
 
     output:
+    file "${bam_featurecounts.baseName}_gene.featureCounts.txt" into geneCounts, featureCounts_to_merge
+    file "${bam_featurecounts.baseName}_gene.featureCounts.txt.summary" into featureCounts_logs
+    file "${bam_featurecounts.baseName}_biotype_counts*mqc.{txt,tsv}" into featureCounts_biotype
+
+    script:
+    def featureCounts_direction = 0
+    if (forward_stranded && !unstranded) {
+        featureCounts_direction = 1
+    } else if (reverse_stranded && !unstranded){
+        featureCounts_direction = 2
+    }
+    // Try to get real sample name
+    sample_name = bam_featurecounts.baseName - 'Aligned.sortedByCoord.out'
+    """
+    featureCounts -a $gtf -g gene_id -o ${bam_featurecounts.baseName}_gene.featureCounts.txt -p -s $featureCounts_direction $bam_featurecounts
+    featureCounts -a $gtf -g gene_biotype -o ${bam_featurecounts.baseName}_biotype.featureCounts.txt -p -s $featureCounts_direction $bam_featurecounts
+    cut -f 1,7 ${bam_featurecounts.baseName}_biotype.featureCounts.txt | tail -n +3 | cat $biotypes_header - >> ${bam_featurecounts.baseName}_biotype_counts_mqc.txt
+    mqc_features_stat.py ${bam_featurecounts.baseName}_biotype_counts_mqc.txt -s $sample_name -f rRNA -o ${bam_featurecounts.baseName}_biotype_counts_gs_mqc.tsv
+    """
 
 
 }
