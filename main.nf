@@ -170,6 +170,7 @@ process get_software_versions {
     echo $params.version > v_pipeline.txt
     echo $workflow.nextflow.version > v_nextflow.txt
     featureCounts --version > v_featurecounts.txt
+    multiqc --version > v_multiqc.txt
     scrape_software_versions.py > software_versions_mqc.yaml
     """
 }
@@ -179,28 +180,38 @@ process get_software_versions {
 * repo_code	file_id	object_id	file_format	file_name	file_size	md5_sum	index_object_id	donor_id/donor_count	project_id/project_count	study
 * We'd need to access the object_id and probably take the file_name with us too ,-) 
 */
+file_manifest = file(${params}.manifest)
+
+crypted_object_ids = Channel
+                   .from(file_manifest)
+                   .splitCsv(header: true, sep="\t")
+                   .view { row -> "${row.object_id}" }
+
 
 /*
  * STEP 0 - ICGC Score Client to get S3 URL
  */
-process fastqc {
+process fetch_encrypted_s3_url {
     tag "$name"
-    publishDir "${params.outdir}/fastqc", mode: 'copy',
-        saveAs: {filename -> filename.indexOf(".zip") > 0 ? "zips/$filename" : "$filename"}
-
+    
     input:
-    set val(name), file(reads) from read_files_fastqc
+    val id from crypted_object_ids
 
     output:
-    file "*_fastqc.{zip,html}" into fastqc_results
+    stdout into s3_url
 
     script:
     """
-    fastqc -q $reads
+    score-client url --object-id $id
     """
 }
 
 /*
-* STEP 1 - 
+* STEP 1 - FeatureCounts on RNAseq BAM files
+*/
+
+
+/*
+* STEP 2 - MultiQC to summarize run
 */
 

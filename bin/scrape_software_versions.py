@@ -6,12 +6,14 @@ import re
 regexes = {
     'ICGC-FeatureCounts': ['v_pipeline.txt', r"(\S+)"],
     'Nextflow': ['v_nextflow.txt', r"(\S+)"],
-     'featureCounts': ['v_featurecounts.txt', r"featureCounts v(\S+)"]
+     'featureCounts': ['v_featurecounts.txt', r"featureCounts v(\S+)"],
+     'MultiQC': ['v_multiqc.txt', r"multiqc, version (\S+)"]
 }
 results = OrderedDict()
 results['ICGC-FeatureCounts'] = '<span style="color:#999999;\">N/A</span>'
 results['Nextflow'] = '<span style="color:#999999;\">N/A</span>'
 results['featureCounts'] = '<span style="color:#999999;\">N/A</span>'
+results['MultiQC'] = '<span style="color:#999999;\">N/A</span>'
 
 # Search each file using its regex
 for k, v in regexes.items():
