@@ -169,8 +169,7 @@ process get_software_versions {
     """
     echo $params.version > v_pipeline.txt
     echo $workflow.nextflow.version > v_nextflow.txt
-    featureCounts --version > v_fastqc.txt
-    multiqc --version > v_multiqc.txt
+    featureCounts --version > v_featurecounts.txt
     scrape_software_versions.py > software_versions_mqc.yaml
     """
 }

@@ -6,14 +6,12 @@ import re
 regexes = {
     'ICGC-FeatureCounts': ['v_pipeline.txt', r"(\S+)"],
     'Nextflow': ['v_nextflow.txt', r"(\S+)"],
-    'FastQC': ['v_fastqc.txt', r"FastQC v(\S+)"],
-    'MultiQC': ['v_multiqc.txt', r"multiqc, version (\S+)"],
+     'featureCounts': ['v_featurecounts.txt', r"featureCounts v(\S+)"]
 }
 results = OrderedDict()
 results['ICGC-FeatureCounts'] = '<span style="color:#999999;\">N/A</span>'
 results['Nextflow'] = '<span style="color:#999999;\">N/A</span>'
-results['FastQC'] = '<span style="color:#999999;\">N/A</span>'
-results['MultiQC'] = '<span style="color:#999999;\">N/A</span>'
+results['featureCounts'] = '<span style="color:#999999;\">N/A</span>'
 
 # Search each file using its regex
 for k, v in regexes.items():
@@ -26,8 +24,8 @@ for k, v in regexes.items():
 # Dump to YAML
 print ('''
 id: 'icgc-featurecounts-software-versions'
-section_name: 'ICGC-FeatureCounts Software Versions'
-section_href: 'https://github.com/apeltzer/ICGC-FeatureCounts'
+section_name: 'nf-icgc-featureCounts Software Versions'
+section_href: 'https://github.com/apeltzer/nf-icgc-featureCounts'
 plot_type: 'html'
 description: 'are collected at run time from the software output.'
 data: |
