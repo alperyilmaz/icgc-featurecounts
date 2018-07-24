@@ -94,9 +94,8 @@ def summary = [:]
 summary['Pipeline Name']  = 'ICGC-FeatureCounts'
 summary['Pipeline Version'] = params.version
 summary['Run Name']     = custom_runName ?: workflow.runName
-summary['Reads']        = params.reads
-summary['Fasta Ref']    = params.fasta
-summary['Data Type']    = params.singleEnd ? 'Single-End' : 'Paired-End'
+summary['Manifest']     = params.manifest
+summary['GTF']          = params.gtf
 summary['Max Memory']   = params.max_memory
 summary['Max CPUs']     = params.max_cpus
 summary['Max Time']     = params.max_time
@@ -166,7 +165,7 @@ crypted_object_ids = Channel
  * STEP 0 - ICGC Score Client to get S3 URL
  */
 process fetch_encrypted_s3_url {
-    tag "$name"
+    tag "$id"
     
     input:
     val id from crypted_object_ids
@@ -183,6 +182,37 @@ process fetch_encrypted_s3_url {
 /*
 * STEP 1 - FeatureCounts on RNAseq BAM files
 */
+
+process featureCounts{
+
+    input:
+    val sc_stdout from s3_url
+
+    output:
+
+
+}
+
+
+
+/*
+ * STEP 9 - Merge featurecounts
+ */
+process merge_featureCounts {
+    tag "${input_files[0].baseName - '.sorted'}"
+    publishDir "${params.outdir}/featureCounts", mode: 'copy'
+
+    input:
+    file input_files from featureCounts_to_merge.collect()
+
+    output:
+    file 'merged_gene_counts.txt'
+
+    script:
+    """
+    merge_featurecounts.py -o merged_gene_counts.txt -i $input_files
+    """
+}
 
 
 /*
