@@ -53,12 +53,15 @@ if (params.help){
 
 // Configurable variables
 params.name = false
-params.fasta = false
 params.gtf = false
 params.manifest = false
 params.multiqc_config = "$baseDir/conf/multiqc_config.yaml"
 params.email = false
 params.plaintext_email = false
+
+biotypes_header = file("$baseDir/assets/biotypes_header.txt")
+multiqc_config = file(params.multiqc_config)
+output_docs = file("$baseDir/docs/output.md")
 
 forward_stranded = params.forward_stranded
 reverse_stranded = params.reverse_stranded
@@ -68,16 +71,19 @@ multiqc_config = file(params.multiqc_config)
 output_docs = file("$baseDir/docs/output.md")
 
 // Validate inputs
-if ( params.fasta ){
-    fasta = file(params.fasta)
-    if( !fasta.exists() ) exit 1, "Fasta file not found: ${params.fasta}"
+if ( params.manifest ){
+    manifest = file(params.manifest)
+    if( !manifest.exists() ) exit 1, "Manifest file not found: ${params.manifest}"
 }
-//
-// NOTE - THIS IS NOT USED IN THIS PIPELINE, EXAMPLE ONLY
-// If you want to use the above in a process, define the following:
-//   input:
-//   file fasta from fasta
-//
+
+if( params.gtf ){
+    Channel
+        .fromPath(params.gtf)
+        .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
+        .into {gtf_featureCounts}
+} else {
+    exit 1, "No GTF annotation specified!"
+}
 
 
 // Has the run name been specified by the user?
