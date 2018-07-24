@@ -26,6 +26,7 @@ def helpMessage() {
     Mandatory arguments:
       --manifest                    Path to manifest file as created from ICGC DCC Portal
       --gtf                         GTF file for featureCounts
+      --accesstoken                 The ICGC/TCGA access token used for retrieving the files on AWS S3
 
       Strandedness:
       --forward_stranded            The library is forward stranded
@@ -186,20 +187,22 @@ process fetch_encrypted_s3_url {
     set file_name, id from crypted_object_ids
 
     output:
-    stdout into s3_url
+    set file_name, file('s3_path.txt') into s3_url
 
     script:
     """
-    score-client url --object-id $id | grep -e "^https:\/\/\S*"
+    score-client url --object-id $id | grep -e "^https:\/\/\S*" > s3_path.txt
     """
 }
+
+//TODO get a set of file_name and object_id, also produce file_name and then attach the s3 URL to it
 
 /*
 * STEP 1 - FeatureCounts on RNAseq BAM files
 */
 
 process featureCounts{
-    tag "${bam_featurecounts.baseName - '.sorted'}"
+    tag "$file_name"
     publishDir "${params.outdir}/featureCounts", mode: 'copy',
         saveAs: {filename ->
             if (filename.indexOf("biotype_counts") > 0) "biotype_counts/$filename"
@@ -209,7 +212,7 @@ process featureCounts{
         }
 
     input:
-    val sc_stdout from s3_url
+    set file_name, file s3_path from s3_url
     file gtf from gtf_featureCounts.collect()
     file biotypes_header
 
@@ -226,12 +229,13 @@ process featureCounts{
         featureCounts_direction = 2
     }
     // Try to get real sample name
-    sample_name = bam_featurecounts.baseName - 'Aligned.sortedByCoord.out'
     """
-    featureCounts -a $gtf -g gene_id -o ${bam_featurecounts.baseName}_gene.featureCounts.txt -p -s $featureCounts_direction $bam_featurecounts
-    featureCounts -a $gtf -g gene_biotype -o ${bam_featurecounts.baseName}_biotype.featureCounts.txt -p -s $featureCounts_direction $bam_featurecounts
-    cut -f 1,7 ${bam_featurecounts.baseName}_biotype.featureCounts.txt | tail -n +3 | cat $biotypes_header - >> ${bam_featurecounts.baseName}_biotype_counts_mqc.txt
-    mqc_features_stat.py ${bam_featurecounts.baseName}_biotype_counts_mqc.txt -s $sample_name -f rRNA -o ${bam_featurecounts.baseName}_biotype_counts_gs_mqc.tsv
+    url = cat "${s3_path}”
+    wget -O $file_name $url
+    featureCounts -a $gtf -g gene_id -o ${bam_featurecounts.baseName}_gene.featureCounts.txt -p -s $featureCounts_direction $file_name
+    featureCounts -a $gtf -g gene_biotype -o ${bam_featurecounts.baseName}_biotype.featureCounts.txt -p -s $featureCounts_direction $file_name
+    cut -f 1,7 ${file_name.baseName}_biotype.featureCounts.txt | tail -n +3 | cat $biotypes_header - >> ${file_name.baseName}_biotype_counts_mqc.txt
+    mqc_features_stat.py ${file_name.baseName}_biotype_counts_mqc.txt -s $file_name -f rRNA -o ${file_name.baseName}_biotype_counts_gs_mqc.tsv
     """
 
 
