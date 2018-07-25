@@ -226,6 +226,7 @@ process featureCounts{
     file "${bam_featurecounts.baseName}_biotype_counts*mqc.{txt,tsv}" into featureCounts_biotype
 
     script:
+    String url = s3_path.text
     def featureCounts_direction = 0
     if (forward_stranded && !unstranded) {
         featureCounts_direction = 1
