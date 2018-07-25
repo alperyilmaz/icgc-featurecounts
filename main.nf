@@ -234,7 +234,7 @@ process featureCounts{
     }
     // Try to get real sample name
     """
-    url=$(cat ${s3_path})
+    url="$(cat $s3_path)"
     wget -O $file_name $url
     featureCounts -a $gtf -g gene_id -o ${bam_featurecounts.baseName}_gene.featureCounts.txt -p -s $featureCounts_direction $file_name
     featureCounts -a $gtf -g gene_biotype -o ${bam_featurecounts.baseName}_biotype.featureCounts.txt -p -s $featureCounts_direction $file_name
