@@ -187,10 +187,10 @@ process fetch_encrypted_s3_url {
     tag "$file_name"
     
     input:
-    set file_name, id from crypted_object_ids
+    set val(file_name), val(id) from crypted_object_ids
 
     output:
-    set file_name, file('s3_path.txt') into s3_url
+    set val(file_name), file('s3_path.txt') into s3_url
 
     script:
     """
