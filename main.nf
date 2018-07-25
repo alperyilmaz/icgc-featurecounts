@@ -190,12 +190,12 @@ process fetch_encrypted_s3_url {
     set val(file_name), val(id) from crypted_object_ids
 
     output:
-    set val(file_name), file('s3_path.txt') into s3_url
+    set val(file_name), val(url) into s3_url
 
     script:
     """
     export ACCESSTOKEN=$params.accesstoken
-    /score-client/bin/score-client url --object-id $id | grep -e "^https*" > s3_path.txt
+    url=$(/score-client/bin/score-client url --object-id $id | grep -e "^https*")
     """
 }
 
@@ -216,7 +216,7 @@ process featureCounts{
         }
 
     input:
-    set val(file_name), file(s3_path) from s3_url
+    set val(file_name), val(url) from s3_url
     file gtf from gtf_featureCounts.collect()
     file biotypes_header
 
@@ -234,7 +234,6 @@ process featureCounts{
     }
     // Try to get real sample name
     """
-    url=\$(cat $s3_path)
     wget -O $file_name $url
     featureCounts -a $gtf -g gene_id -o ${bam_featurecounts.baseName}_gene.featureCounts.txt -p -s $featureCounts_direction $file_name
     featureCounts -a $gtf -g gene_biotype -o ${bam_featurecounts.baseName}_biotype.featureCounts.txt -p -s $featureCounts_direction $file_name
