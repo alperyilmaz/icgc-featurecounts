@@ -194,7 +194,7 @@ process fetch_encrypted_s3_url {
 
     script:
     """
-    export ACCESSTOKEN=$params.accesstoken
+    export ACCESSTOKEN=${params.accesstoken}
     url=$(/score-client/bin/score-client url --object-id $id | grep -e "^https*")
     """
 }
