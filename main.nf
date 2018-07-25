@@ -173,7 +173,7 @@ process get_software_versions {
 file_manifest = file(params.manifest)
 
 Channel.from(file_manifest)
-       .splitCsv(header: true, sep='\t')
+       .splitCsv(header: true, sep:'\t')
        .map { row -> tuple("${row.file_name}", "${row.object_id}")}
        .set (crypted_object_ids)
 
