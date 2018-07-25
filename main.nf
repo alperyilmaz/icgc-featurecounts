@@ -170,7 +170,7 @@ process get_software_versions {
 * repo_code	file_id	object_id	file_format	file_name	file_size	md5_sum	index_object_id	donor_id/donor_count	project_id/project_count	study
 * We'd need to access the object_id and probably take the file_name with us too ,-) 
 */
-file_manifest = file("${params}.manifest")
+file_manifest = file("$params.manifest")
 
 Channel.from(file_manifest)
        .splitCsv(header: true, sep="\t")
