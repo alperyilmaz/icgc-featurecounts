@@ -216,7 +216,7 @@ process featureCounts{
         }
 
     input:
-    set file_name, file s3_path from s3_url
+    set val(file_name), file(s3_path) from s3_url
     file gtf from gtf_featureCounts.collect()
     file biotypes_header
 
