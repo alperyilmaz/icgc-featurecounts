@@ -192,7 +192,7 @@ process fetch_encrypted_s3_url {
     script:
     """
     ACCESSTOKEN=$params.accesstoken
-    score-client url --object-id $id | grep -e "^https:\/\/\S*" > s3_path.txt
+    score-client url --object-id $id | grep -e '^https:\/\/\S*' > s3_path.txt
     """
 }
 
