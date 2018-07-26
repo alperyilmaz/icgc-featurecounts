@@ -236,8 +236,8 @@ process featureCounts{
     // Try to get real sample name
     """
     wget -O $file_name $url
-    featureCounts -a $gtf -g gene_id -o ${bam_featurecounts.baseName}_gene.featureCounts.txt -p -s $featureCounts_direction $file_name
-    featureCounts -a $gtf -g gene_biotype -o ${bam_featurecounts.baseName}_biotype.featureCounts.txt -p -s $featureCounts_direction $file_name
+    featureCounts -a $gtf -g gene_id -o ${file_name.baseName}_gene.featureCounts.txt -p -s $featureCounts_direction $file_name
+    featureCounts -a $gtf -g gene_biotype -o ${file_name.baseName}_biotype.featureCounts.txt -p -s $featureCounts_direction $file_name
     cut -f 1,7 ${file_name.baseName}_biotype.featureCounts.txt | tail -n +3 | cat $biotypes_header - >> ${file_name.baseName}_biotype_counts_mqc.txt
     mqc_features_stat.py ${file_name.baseName}_biotype_counts_mqc.txt -s $file_name -f rRNA -o ${file_name.baseName}_biotype_counts_gs_mqc.tsv
     """
