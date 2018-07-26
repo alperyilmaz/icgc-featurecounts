@@ -226,7 +226,7 @@ process featureCounts{
     file "${bam_featurecounts.baseName}_biotype_counts*mqc.{txt,tsv}" into featureCounts_biotype
 
     script:
-    String url = new File('s3_path').text
+    url = file(myPath).text
     def featureCounts_direction = 0
     if (forward_stranded && !unstranded) {
         featureCounts_direction = 1
@@ -235,7 +235,6 @@ process featureCounts{
     }
     // Try to get real sample name
     """
-    url=\$(cat $s3_path)
     wget -O $file_name $url
     featureCounts -a $gtf -g gene_id -o ${bam_featurecounts.baseName}_gene.featureCounts.txt -p -s $featureCounts_direction $file_name
     featureCounts -a $gtf -g gene_biotype -o ${bam_featurecounts.baseName}_biotype.featureCounts.txt -p -s $featureCounts_direction $file_name
