@@ -81,7 +81,7 @@ if( params.gtf ){
     Channel
         .fromPath(params.gtf)
         .ifEmpty { exit 1, "GTF annotation file not found: ${params.gtf}" }
-        .into {gtf_featureCounts}
+        .set {gtf_featureCounts}
 } else {
     exit 1, "No GTF annotation specified!"
 }
