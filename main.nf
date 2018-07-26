@@ -221,9 +221,9 @@ process featureCounts{
     file biotypes_header
 
     output:
-    file "${bam_featurecounts.baseName}_gene.featureCounts.txt" into geneCounts, featureCounts_to_merge
-    file "${bam_featurecounts.baseName}_gene.featureCounts.txt.summary" into featureCounts_logs
-    file "${bam_featurecounts.baseName}_biotype_counts*mqc.{txt,tsv}" into featureCounts_biotype
+    file "${file_name}_gene.featureCounts.txt" into geneCounts, featureCounts_to_merge
+    file "${file_name}_gene.featureCounts.txt.summary" into featureCounts_logs
+    file "${file_name}_biotype_counts*mqc.{txt,tsv}" into featureCounts_biotype
 
     script:
     url = file(s3_path).text
@@ -236,10 +236,10 @@ process featureCounts{
     // Try to get real sample name
     """
     wget -O $file_name $url
-    featureCounts -a $gtf -g gene_id -o ${file_name.baseName}_gene.featureCounts.txt -p -s $featureCounts_direction $file_name
-    featureCounts -a $gtf -g gene_biotype -o ${file_name.baseName}_biotype.featureCounts.txt -p -s $featureCounts_direction $file_name
-    cut -f 1,7 ${file_name.baseName}_biotype.featureCounts.txt | tail -n +3 | cat $biotypes_header - >> ${file_name.baseName}_biotype_counts_mqc.txt
-    mqc_features_stat.py ${file_name.baseName}_biotype_counts_mqc.txt -s $file_name -f rRNA -o ${file_name.baseName}_biotype_counts_gs_mqc.tsv
+    featureCounts -a $gtf -g gene_id -o ${file_name}_gene.featureCounts.txt -p -s $featureCounts_direction $file_name
+    featureCounts -a $gtf -g gene_biotype -o ${file_name}_biotype.featureCounts.txt -p -s $featureCounts_direction $file_name
+    cut -f 1,7 ${file_name}_biotype.featureCounts.txt | tail -n +3 | cat $biotypes_header - >> ${file_name}_biotype_counts_mqc.txt
+    mqc_features_stat.py ${file_name}_biotype_counts_mqc.txt -s $file_name -f rRNA -o ${file_name}_biotype_counts_gs_mqc.tsv
     """
 
 
@@ -251,7 +251,7 @@ process featureCounts{
  * STEP 9 - Merge featurecounts
  */
 process merge_featureCounts {
-    tag "${input_files[0].baseName - '.sorted'}"
+    tag "${input_files[0]}"
     publishDir "${params.outdir}/featureCounts", mode: 'copy'
 
     input:
