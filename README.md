@@ -1,4 +1,6 @@
 # ICGC-FeatureCounts
+WIP: This is still in development, but should be relatively stable by now. 
+
 This pipeline uses featureCounts on cancer datasets from ICGC and generates count matrices, similar to what [nf-core/RNAseq](https://github.com/nf-core/RNAseq) does. Users can specify a ICGC Manifest file with object ids, which will then be converted to encrypted S3 URLs. The pipeline then uses the provided GTF file to generate count matrices for all files in the manifest.
 
 [![Build Status](https://travis-ci.com/nf-core/ICGC-featureCounts.svg?branch=master)](https://travis-ci.com/nf-core/ICGC-featureCounts)
