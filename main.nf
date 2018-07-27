@@ -232,6 +232,7 @@ process featureCounts{
 
     script:
     url = file(s3_path).text
+    url = url.trim()
     def featureCounts_direction = 0
     if (forward_stranded && !unstranded) {
         featureCounts_direction = 1
@@ -240,7 +241,7 @@ process featureCounts{
     }
     // Try to get real sample name
     """
-    wget -O $file_name $url
+    wget -O $file_name \"${url}\"
     featureCounts -a $gtf -g gene_id -o ${file_name}_gene.featureCounts.txt -p -s $featureCounts_direction $file_name
     featureCounts -a $gtf -g gene_biotype -o ${file_name}_biotype.featureCounts.txt -p -s $featureCounts_direction $file_name
     cut -f 1,7 ${file_name}_biotype.featureCounts.txt | tail -n +3 | cat $biotypes_header - >> ${file_name}_biotype_counts_mqc.txt
