@@ -59,6 +59,7 @@ params.manifest = false
 params.multiqc_config = "$baseDir/conf/multiqc_config.yaml"
 params.email = false
 params.plaintext_email = false
+params.test = false
 
 biotypes_header = file("$baseDir/assets/biotypes_header.txt")
 multiqc_config = file(params.multiqc_config)
@@ -193,13 +194,17 @@ process fetch_encrypted_s3_url {
     set val(file_name), file('s3_path.txt') into s3_url
 
     script:
+    if(params.test){
+        """
+        echo "ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/pilot3_exon_targetted_GRCh37_bams/data/NA06994/alignment/NA06994.chrom21.LS454.ssaha2.CEU.exon_targetted.20100311.bam" > "s3_path.txt"
+        """
+    } else {
     """
     export ACCESSTOKEN=$params.accesstoken
     /score-client/bin/score-client url --object-id $id | grep -e "^https*" > s3_path.txt
     """
+    }
 }
-
-//TODO get a set of file_name and object_id, also produce file_name and then attach the s3 URL to it
 
 /*
 * STEP 1 - FeatureCounts on RNAseq BAM files
