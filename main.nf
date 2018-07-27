@@ -271,8 +271,54 @@ process merge_featureCounts {
     """
 }
 
+/*
+ * Pipeline parameters to go into MultiQC report
+ */
+process workflow_summary_mqc {
+
+    output:
+    file 'workflow_summary_mqc.yaml' into workflow_summary_yaml
+
+    exec:
+    def yaml_file = task.workDir.resolve('workflow_summary_mqc.yaml')
+    yaml_file.text  = """
+    id: 'nfcore-icgc-featurecounts-summary'
+    description: " - this information is collected when the pipeline is started."
+    section_name: 'nfcore/ICGC-FeatureCounts Workflow Summary'
+    section_href: 'https://github.com/nf-core/ICGC-FeatureCounts'
+    plot_type: 'html'
+    data: |
+        <dl class=\"dl-horizontal\">
+${summary.collect { k,v -> "            <dt>$k</dt><dd><samp>${v ?: '<span style=\"color:#999999;\">N/A</a>'}</samp></dd>" }.join("\n")}
+        </dl>
+    """.stripIndent()
+}
+
 
 /*
 * STEP 2 - MultiQC to summarize run
 */
+
+process multiqc {
+    publishDir "${params.outdir}/MultiQC", mode: 'copy'
+
+    input:
+    file multiqc_config
+    file ('featureCounts/*') from featureCounts_logs.collect()
+    file ('featureCounts_biotype/*') from featureCounts_biotype.collect()
+    file ('software_versions/*') from software_versions_yaml.collect()
+    file ('workflow_summary/*') from workflow_summary_yaml.collect()
+
+    output:
+    file "*multiqc_report.html" into multiqc_report
+    file "*_data"
+
+    script:
+    rtitle = ''
+    rfilename = ''
+    """
+    multiqc . -f $rtitle $rfilename --config $multiqc_config \\
+        -m custom_content -m featureCounts
+    """
+}
 
