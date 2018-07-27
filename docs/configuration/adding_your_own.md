@@ -9,7 +9,8 @@ If you are the only person to be running this pipeline, you can create your conf
 A basic configuration comes with the pipeline, which runs by default (the `standard` config profile - see [`conf/base.config`](../conf/base.config)). This means that you only need to configure the specifics for your system and overwrite any defaults that you want to change.
 
 ## Cluster Environment
-By default, pipeline uses the `local` Nextflow executor - in other words, all jobs are run in the login session. If you're using a simple server, this may be fine. If you're using a compute cluster, this is bad as all jobs will run on the head node.
+
+By default, the pipeline uses the `local` Nextflow executor - in other words, all jobs are run in the login session. If you're using a simple server, this may be fine. If you're using a compute cluster, this is bad as all jobs will run on the head node.
 
 To specify your cluster environment, add the following line to your config file:
 
@@ -29,7 +30,6 @@ process {
   clusterOptions = '-A myproject'
 }
 ```
-
 
 ## Software Requirements
 To run the pipeline, several software packages are required. How you satisfy these requirements is essentially up to you and depends on your system. If possible, we _highly_ recommend using either Docker or Singularity.
@@ -97,42 +97,3 @@ Then transfer this file and run the pipeline with this path:
 nextflow run /path/to/icgc-featurecounts -with-singularity /path/to/icgc-featurecounts.img
 ```
 
-
-### Manual Installation
-As a last resort, you may need to install the required software manually. We recommend using [Bioconda](https://bioconda.github.io/) to do this. The following instructions are an example only and will not be updated with the pipeline.
-
-#### 1) Install miniconda in your home directory
-``` bash
-cd
-wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh
-```
-
-#### 2) Add the bioconda conda channel (and others)
-```bash
-conda config --add channels anaconda
-conda config --add channels conda-forge
-conda config --add channels defaults
-conda config --add channels r
-conda config --add channels bioconda
-conda config --add channels salilab
-```
-
-#### 3) Create a conda environment, with all necessary packages:
-```bash
-conda create --name icgc-featurecounts_py2.7 python=2.7
-source activate icgc-featurecounts_py2.7
-conda install --yes \
-    fastqc \
-    multiqc
-```
-_(Feel free to adjust versions as required.)_
-
-##### 4) Usage
-Once created, the conda environment can be activated before running the pipeline and deactivated afterwards:
-
-```bash
-source activate icgc-featurecounts_py2.7
-# run pipeline
-source deactivate
-```
