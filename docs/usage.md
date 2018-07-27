@@ -79,6 +79,13 @@ The pipeline requires a GTF file as input for your data analysis. You may use iG
 --gtf 's3://ngi-igenomes/igenomes/Homo_sapiens/Ensembl/GRCh37/Annotation/Genes/genes.gtf'
 ```
 
+### `--accesstoken`
+
+The pipeline requires you to specify your [ICGC AWS Accesstoken](http://docs.icgc.org/cloud/guide/#token-manager) to be specified. This token is used to generate programmatically the required pre-authenticated AWS S3 URLs for the requested samples. For example:
+
+```bash
+--accesstoken 'abccaa7-ab30437a-49230a'
+```
 
 
 ## Job Resources
