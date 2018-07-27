@@ -14,7 +14,7 @@ NXF_OPTS='-Xms1g -Xmx4g'
 ## Running the pipeline
 The typical command for running the pipeline is as follows:
 ```bash
-nextflow run ICGC-FeatureCounts --reads '*_R{1,2}.fastq.gz' -profile docker
+nextflow run nf-core/ICGC-FeatureCounts --manifest 'your-input-manifest' --accesstoken 'your-access-token-for-icgc-data' --gtf 'path-to-gtf-file' -profile standard,docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
@@ -38,7 +38,7 @@ nextflow pull ICGC-FeatureCounts
 ### Reproducibility
 It's a good idea to specify a pipeline version when running the pipeline on your data. This ensures that a specific version of the pipeline code and software are used when you run your pipeline. If you keep using the same tag, you'll be running the same version of the pipeline, even if there have been changes to the code since.
 
-First, go to the [ICGC-FeatureCounts releases page](https://github.com/ICGC-FeatureCounts/releases) and find the latest version number - numeric only (eg. `1.3.1`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.3.1`.
+First, go to the [ICGC-FeatureCounts releases page](https://github.com/nf-core/ICGC-FeatureCounts/releases) and find the latest version number - numeric only (eg. `1.3.1`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.3.1`.
 
 This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future.
 
@@ -60,72 +60,26 @@ Use this parameter to choose a configuration profile. Each profile is designed f
 * `none`
     * No configuration at all. Useful if you want to build your own config from scratch and want to avoid loading in the default `base` config profile (not recommended).
 
-### `--reads`
-Use this to specify the location of your input FastQ files. For example:
+### `--manifest`
+Use this to specify the location of your ICGC AWS Manifest file. It should be a `tsv` file containing the columns `object_id` and `file_name`
+For example:
 
 ```bash
---reads 'path/to/data/sample_*_{1,2}.fastq'
+--manifest 'path/to/data/manifest.tsv'
 ```
 
 Please note the following requirements:
 
 1. The path must be enclosed in quotes
-2. The path must have at least one `*` wildcard character
-3. When using the pipeline with paired end data, the path must use `{1,2}` notation to specify read pairs.
 
-If left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`
-
-### `--singleEnd`
-By default, the pipeline expects paired-end data. If you have single-end data, you need to specify `--singleEnd` on the command line when you launch the pipeline. A normal glob pattern, enclosed in quotation marks, can then be used for `--reads`. For example:
+### `--gtf`
+The pipeline requires a GTF file as input for your data analysis. You may use iGenomes S3 URLs for an appropriate GTF file For example:
 
 ```bash
---singleEnd --reads '*.fastq'
+--gtf 's3://ngi-igenomes/igenomes/Homo_sapiens/Ensembl/GRCh37/Annotation/Genes/genes.gtf'
 ```
 
-It is not possible to run a mixture of single-end and paired-end files in one run.
 
-
-## Reference Genomes
-
-The pipeline config files come bundled with paths to the illumina iGenomes reference index files. If running with docker or AWS, the configuration is set up to use the [AWS-iGenomes](https://ewels.github.io/AWS-iGenomes/) resource.
-
-### `--genome` (using iGenomes)
-There are 31 different species supported in the iGenomes references. To run the pipeline, you must specify which to use with the `--genome` flag.
-
-You can find the keys to specify the genomes in the [iGenomes config file](../conf/igenomes.config). Common genomes that are supported are:
-
-* Human
-  * `--genome GRCh37`
-* Mouse
-  * `--genome GRCm38`
-* _Drosophila_
-  * `--genome BDGP6`
-* _S. cerevisiae_
-  * `--genome 'R64-1-1'`
-
-> There are numerous others - check the config file for more.
-
-Note that you can use the same configuration setup to save sets of reference files for your own use, even if they are not part of the iGenomes resource. See the [Nextflow documentation](https://www.nextflow.io/docs/latest/config.html) for instructions on where to save such a file.
-
-The syntax for this reference configuration is as follows:
-
-```nextflow
-params {
-  genomes {
-    'GRCh37' {
-      fasta   = '<path to the genome fasta file>' // Used if no star index given
-    }
-    // Any number of additional genomes, key is used with --genome
-  }
-}
-```
-
-### `--fasta`
-If you prefer, you can specify the full path to your reference genome when you run the pipeline:
-
-```bash
---fasta '[path to Fasta reference]'
-```
 
 ## Job Resources
 ### Automatic resubmission
@@ -137,16 +91,6 @@ Wherever process-specific requirements are set in the pipeline, the default valu
 ## Other command line parameters
 ### `--outdir`
 The output directory where the results will be saved.
-
-### `--email`
-Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to speicfy this on the command line for every run.
-
-### `-name`
-Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
-
-This is used in the MultiQC report (if not default) and in the summary HTML / e-mail (always).
-
-**NB:** Single hyphen (core Nextflow option)
 
 ### `-resume`
 Specify this when restarting a pipeline. Nextflow will used cached results from any pipeline steps where the inputs are the same, continuing from where it got to previously.
@@ -177,12 +121,6 @@ Should be a string in the format integer-unit. eg. `--max_time '2.h'`
 ### `--max_cpus`
 Use to set a top-limit for the default CPU requirement for each process.
 Should be a string in the format integer-unit. eg. `--max_cpus 1`
-
-### `--plaintext_email`
-Set to receive plain-text e-mails instead of HTML formatted.
-
-### `--sampleLevel`
-Used to turn of the edgeR MDS and heatmap. Set automatically when running on fewer than 3 samples.
 
 ### `--multiqc_config`
 If you would like to supply a custom config file to MultiQC, you can specify a path with `--multiqc_config`. This is used instead of the config file specific to the pipeline.
