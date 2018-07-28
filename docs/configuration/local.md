@@ -11,7 +11,7 @@ First, install docker on your system: [Docker Installation Instructions](https:/
 
 Then, simply run the analysis pipeline:
 ```bash
-nextflow run nf-core/ICGC-FeatureCounts -profile docker --reads '<path to your reads>'
+nextflow run nf-core/ICGC-FeatureCounts -profile docker --manifest '<path to your manifest>' --gtf '<path to your gtf file>' 
 ```
 
 Nextflow will recognise `ICGC-FeatureCounts` and download the pipeline from GitHub. The `-profile docker` configuration lists the [icgc-featurecounts](https://hub.docker.com/r/nfcore/icgc-featurecounts/) image that we have created and is hosted at dockerhub, and this is downloaded.
