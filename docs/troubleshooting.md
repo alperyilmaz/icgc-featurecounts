@@ -4,26 +4,17 @@
 
 The main reason for this behaviour is: Your links that were created in step 1 did run out of time. Process `fetch_encrypted_s3_url` gets pre-authenticated S3 URLs for the requested BAM files and passes these to process `featureCounts`. If you have many BAM files that in total take more than a day for downloading and processing (> ~30), you might want to split the workload to multiple machines. More detailed information can be found [here](http://docs.icgc.org/cloud/guide/#how-long-will-pre-signed-urls-remain-valid).
 
-## Input files not found
+## Input Manifest not found
 
-If only no file, only one input file , or only read one and not read two is picked up then something is wrong with your input file declaration
+Please make sure to specify a manifest file in the correct format. These are automatically created by the ICGC/DCC Data Portal in the correct `.tsv.gz` format and should only be unpacked to `tsv` format. Do not modify the files as the header is required to read the `object_id` and `file_name` information correctly. Further requirements:
 
 1. The path must be enclosed in quotes (`'` or `"`)
-2. The path must have at least one `*` wildcard character. This is even if you are only running one paired end sample.
-3. When using the pipeline with paired end data, the path must use `{1,2}` or `{R1,R2}` notation to specify read pairs.
-4.  If you are running Single end data make sure to specify `--singleEnd`
 
-If the pipeline can't find your files then you will get the following error
+If the pipeline can't find your manifest then you will get the following error
 
 ```
-ERROR ~ Cannot find any reads matching: *{1,2}.fastq.gz
+ERROR ~ Manifest file not found
 ```
-
-Note that if your sample name is "messy" then you have to be very particular with your glob specification. A file name like `L1-1-D-2h_S1_L002_R1_001.fastq.gz` can be difficult enough for a human to read. Specifying `*{1,2}*.gz` wont work give you what you want Whilst `*{R1,R2}*.gz` will.
-
-
-## Data organization
-The pipeline can't take a list of multiple input files - it takes a glob expression. If your input files are scattered in different paths then we recommend that you generate a directory with symlinked files. If running in paired end mode please make sure that your files are sensibly named so that they can be properly paired. See the previous point.
 
 ## Extra resources and getting help
 If you still have an issue with running the pipeline then feel free to contact us.
