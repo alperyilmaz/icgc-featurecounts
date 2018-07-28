@@ -46,9 +46,9 @@ Then, simply run the analysis pipeline:
 nextflow run ICGC-FeatureCounts -profile docker --reads '<path to your reads>'
 ```
 
-Nextflow will recognise `ICGC-FeatureCounts` and download the pipeline from GitHub. The `-profile docker` configuration lists the [icgc-featurecounts](https://hub.docker.com/r/icgc-featurecounts/) image that we have created and is hosted at dockerhub, and this is downloaded.
+Nextflow will recognise `ICGC-FeatureCounts` and download the pipeline from GitHub. The `-profile docker` configuration lists the [icgc-featurecounts](https://hub.docker.com/r/nfcore/icgc-featurecounts/) image that we have created and is hosted at dockerhub, and this is downloaded.
 
-The public docker images are tagged with the same version numbers as the code, which you can use to ensure reproducibility. When running the pipeline, specify the pipeline version with `-r`, for example `-r v1.3`. This uses pipeline code and docker image from this tagged version.
+The public docker images are tagged with the same version numbers as the code, which you can use to ensure reproducibility. When running the pipeline, specify the pipeline version with `-r`, for example `-r v1.0.0`. This uses pipeline code and docker image from this tagged version.
 
 To add docker support to your own config file (instead of using the `docker` profile, which runs locally), add the following:
 
@@ -63,37 +63,15 @@ process {
 
 The variable `wf_container` is defined dynamically and automatically specifies the image tag if Nextflow is running with `-r`.
 
-A test suite for docker comes with the pipeline, and can be run by moving to the [`tests` directory](https://github.com/ICGC-FeatureCounts/tree/master/tests) and running `./run_test.sh`. This will download a small yeast genome and some data, and attempt to run the pipeline through docker on that small dataset. This is automatically run using [Travis](https://travis-ci.org/ICGC-FeatureCounts/) whenever changes are made to the pipeline.
+A test suite for docker comes with the pipeline, and can be run by simply using the test profile:
+```bash
+nextflow run nf-core/ICGC-featurecounts -profile test 
+```
+This is also automatically run using [Travis](https://travis-ci.org/ICGC-FeatureCounts/) whenever changes are made to the pipeline.
 
 ### Singularity image
 Many HPC environments are not able to run Docker due to security issues. [Singularity](http://singularity.lbl.gov/) is a tool designed to run on such HPC systems which is very similar to Docker. Even better, it can use create images directly from dockerhub.
 
-To use the singularity image for a single run, use `-with-singularity 'docker://ICGC-FeatureCounts'`. This will download the docker container from dockerhub and create a singularity image for you dynamically.
+To use the singularity image for a single run, use `-with-singularity 'shub://nf-core/ICGC-featureCounts'`. This will download the Singularity container from Singularity hub.
 
-To specify singularity usage in your pipeline config file, add the following:
-
-```nextflow
-singularity {
-  enabled = true
-}
-process {
-  container = "docker://$wf_container"
-}
-```
-
-The variable `wf_container` is defined dynamically and automatically specifies the image tag if Nextflow is running with `-r`.
-
-If you intend to run the pipeline offline, nextflow will not be able to automatically download the singularity image for you. Instead, you'll have to do this yourself manually first, transfer the image file and then point to that.
-
-First, pull the image file where you have an internet connection:
-
-```bash
-singularity pull --name icgc-featurecounts.img docker://ICGC-FeatureCounts
-```
-
-Then transfer this file and run the pipeline with this path:
-
-```bash
-nextflow run /path/to/icgc-featurecounts -with-singularity /path/to/icgc-featurecounts.img
-```
-
+To specify singularity usage in your pipeline config file, use the profile Singularity.
