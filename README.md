@@ -26,4 +26,4 @@ The ICGC-FeatureCounts pipeline comes with documentation about the pipeline, fou
 5. [Troubleshooting](docs/troubleshooting.md)
 
 ### Credits
-This pipeline was written by Alexander Peltzer ([apeltzer](https://github.com/apeltzer)) at [QBiC](apeltzer.github.io).
+This pipeline was written by Alexander Peltzer ([apeltzer](https://github.com/apeltzer)) at [QBiC](apeltzer.github.io) with some help from Paolo DiTommaso ([pditommaso](https://github.com/pditommaso)) and the Nextflow community.
