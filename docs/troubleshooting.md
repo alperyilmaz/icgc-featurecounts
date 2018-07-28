@@ -2,7 +2,7 @@
 
 ## I'm getting lots of '403 Forbidden' errors
 
-The main reason for this behaviour is: Your links that were created in step 1 did run out of time. Process `fetch_encrypted_s3_url` gets pre-authenticated S3 URLs for the requested BAM files and passes these to process `featureCounts`. If you have many BAM files that in total take more than a day for downloading and processing (> ~30), you might want to split the workload to multiple machines. 
+The main reason for this behaviour is: Your links that were created in step 1 did run out of time. Process `fetch_encrypted_s3_url` gets pre-authenticated S3 URLs for the requested BAM files and passes these to process `featureCounts`. If you have many BAM files that in total take more than a day for downloading and processing (> ~30), you might want to split the workload to multiple machines. More detailed information can be found [here](http://docs.icgc.org/cloud/guide/#how-long-will-pre-signed-urls-remain-valid).
 
 ## Input files not found
 
