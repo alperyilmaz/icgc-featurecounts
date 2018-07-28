@@ -1,5 +1,9 @@
 # Troubleshooting
 
+## I'm getting lots of '403 Forbidden' errors
+
+The main reason for this behaviour is: Your links that were created in step 1 did run out of time. Process `fetch_encrypted_s3_url` gets pre-authenticated S3 URLs for the requested BAM files and passes these to process `featureCounts`. If you have many BAM files that in total take more than a day for downloading and processing (> ~30), you might want to split the workload to multiple machines. 
+
 ## Input files not found
 
 If only no file, only one input file , or only read one and not read two is picked up then something is wrong with your input file declaration
@@ -23,6 +27,6 @@ The pipeline can't take a list of multiple input files - it takes a glob express
 
 ## Extra resources and getting help
 If you still have an issue with running the pipeline then feel free to contact us.
-Have look at the [pipeline website](https://github.com/apeltzer/ICGC-FeatureCounts) to find out how.
+Have look at the [pipeline website](https://github.com/nf-core/ICGC-FeatureCounts) to find out how.
 
 If you have problems that are related to Nextflow and not our pipeline then check out the [Nextflow gitter channel](https://gitter.im/nextflow-io/nextflow) or the [google group](https://groups.google.com/forum/#!forum/nextflow).
