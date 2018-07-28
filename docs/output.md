@@ -1,7 +1,7 @@
 # ICGC-FeatureCounts
 This pipeline takes some BAM files from ICGC and runs featureCounts on them.
 
-This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline. Documentation for the [featureCounts](#featurecounts) part taken from [nf-core/RNAseq](https://github.com/nf-core/RNAseq), written by Rickard Hammaren and Phil Ewels.
+This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline. Documentation for the [featureCounts](#featurecounts) part taken from [nf-core/RNAseq](https://github.com/nf-core/RNAseq), written by [Rickard Hammarén](https://github.com/Hammarn) and [Phil Ewels](https://github.com/ewels).
 
 ## Pipeline overview
 The pipeline is built using [Nextflow](https://www.nextflow.io/)
