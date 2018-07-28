@@ -276,7 +276,7 @@ process merge_featureCounts {
  * Pipeline parameters to go into MultiQC report
  */
 process workflow_summary_mqc {
-
+    executor 'local'
     output:
     file 'workflow_summary_mqc.yaml' into workflow_summary_yaml
 
