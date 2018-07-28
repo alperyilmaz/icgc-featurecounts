@@ -1,26 +1,32 @@
 # ICGC-FeatureCounts
 This pipeline takes some BAM files from ICGC and runs featureCounts on them.
 
-This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline.
+This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline. Documentation for the [featureCounts](#featurecounts) part taken from [nf-core/RNAseq](https://github.com/nf-core/RNAseq), written by Rickard Hammaren and Phil Ewels.
 
 ## Pipeline overview
 The pipeline is built using [Nextflow](https://www.nextflow.io/)
 and processes data using the following steps:
 
-* [FastQC](#fastqc) - read quality control
+* [featureCounts](#featurecounts) - gene counts, biotype counts, rRNA estimation.
 * [MultiQC](#multiqc) - aggregate report, describing results of the whole pipeline
 
-## FastQC
-[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your reads. It provides information about the quality score distribution across your reads, the per base sequence content (%T/A/G/C). You get information about adapter contamination and other overrepresented sequences.
+## featureCounts
+[featureCounts](http://bioinf.wehi.edu.au/featureCounts/) from the subread package summarises the read distribution over genomic features such as genes, exons, promotors, gene bodies, genomic bins and chromosomal locations.
+RNA reads should mostly overlap genes, so be assigned.
 
-For further reading and documentation see the [FastQC help](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/).
+![featureCounts](images/featureCounts_assignment_plot.png)
 
-**Output directory: `results/fastqc`**
+We also use featureCounts to count overlaps with different classes of features. This gives a good idea of where aligned reads are ending up and can show potential problems such as rRNA contamination.
+![biotypes](images/featureCounts_biotype_plot.png)
 
-* `sample_fastqc.html`
-  * FastQC report, containing quality metrics for your untrimmed raw fastq files
-* `zips/sample_fastqc.zip`
-  * zip file containing the FastQC report, tab-delimited data file and plot images
+**Output directory: `results/featureCounts`**
+
+* `Sample.bam_biotype_counts.txt`
+  * Read counts for the different gene biotypes that featureCounts distinguishes.
+* `Sample.featureCounts.txt`
+  * Read the counts for each gene provided in the reference `gtf` file
+* `Sample.featureCounts.txt.summary`
+  * Summary file, containing statistics about the counts
 
 ## MultiQC
 [MultiQC](http://multiqc.info) is a visualisation tool that generates a single HTML report summarising all samples in your project. Most of the pipeline QC results are visualised in the report and further statistics are available in within the report data directory.
