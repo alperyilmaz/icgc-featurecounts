@@ -32,46 +32,4 @@ process {
 ```
 
 ## Software Requirements
-To run the pipeline, several software packages are required. How you satisfy these requirements is essentially up to you and depends on your system. If possible, we _highly_ recommend using either Docker or Singularity.
-
-### Docker
-Docker is a great way to run ICGC-FeatureCounts, as it manages all software installations and allows the pipeline to be run in an identical software environment across a range of systems.
-
-Nextflow has [excellent integration](https://www.nextflow.io/docs/latest/docker.html) with Docker, and beyond installing the two tools, not much else is required.
-
-First, install docker on your system: [Docker Installation Instructions](https://docs.docker.com/engine/installation/)
-
-Then, simply run the analysis pipeline:
-```bash
-nextflow run ICGC-FeatureCounts -profile docker --reads '<path to your reads>'
-```
-
-Nextflow will recognise `ICGC-FeatureCounts` and download the pipeline from GitHub. The `-profile docker` configuration lists the [icgc-featurecounts](https://hub.docker.com/r/nfcore/icgc-featurecounts/) image that we have created and is hosted at dockerhub, and this is downloaded.
-
-The public docker images are tagged with the same version numbers as the code, which you can use to ensure reproducibility. When running the pipeline, specify the pipeline version with `-r`, for example `-r v1.0.0`. This uses pipeline code and docker image from this tagged version.
-
-To add docker support to your own config file (instead of using the `docker` profile, which runs locally), add the following:
-
-```nextflow
-docker {
-  enabled = true
-}
-process {
-  container = wf_container
-}
-```
-
-The variable `wf_container` is defined dynamically and automatically specifies the image tag if Nextflow is running with `-r`.
-
-A test suite for docker comes with the pipeline, and can be run by simply using the test profile:
-```bash
-nextflow run nf-core/ICGC-featurecounts -profile test 
-```
-This is also automatically run using [Travis](https://travis-ci.org/ICGC-FeatureCounts/) whenever changes are made to the pipeline.
-
-### Singularity image
-Many HPC environments are not able to run Docker due to security issues. [Singularity](http://singularity.lbl.gov/) is a tool designed to run on such HPC systems which is very similar to Docker. Even better, it can use create images directly from dockerhub.
-
-To use the singularity image for a single run, use `-with-singularity 'shub://nf-core/ICGC-featureCounts'`. This will download the Singularity container from Singularity hub.
-
-To specify singularity usage in your pipeline config file, use the profile Singularity.
+To run the pipeline, several software packages are required. How you satisfy these requirements is essentially up to you and depends on your system. If possible, we _highly_ recommend using either Docker or Singularity. See also [these](local) instructions.
