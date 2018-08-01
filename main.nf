@@ -33,7 +33,13 @@ def helpMessage() {
       --reverse_stranded            The library is reverse stranded
       --unstranded                  The default behaviour
 
-      -profile                      Hardware config to use, e.g. docker / aws
+      -profile                      Hardware config to use, e.g. AWSBatch
+
+      AWSBatch:
+      --awsqueue                    The AWSBatch Queue to use for running this pipeline
+      --awsregion                   The AWSBatch Region to use for this (default: us-east-1)
+      --workDir                     URL to S3 Storage Bucket for temporary work files. (default: ./work)
+
 
     Other options:
       --outdir                      The output directory where the results will be saved. Must be an S3 bucket on AWS Region used by ICGC (Virginia).
@@ -129,6 +135,10 @@ summary['Working dir']    = workflow.workDir
 summary['Output dir']     = params.outdir
 summary['Script dir']     = workflow.projectDir
 summary['Config Profile'] = workflow.profile
+if(workflow.profile == 'awsbatch'){
+    summary['AWS Queue'] = params.awsqueue
+    summary['AWS Region'] = params.awsregion
+}
 if(params.email) summary['E-mail Address'] = params.email
 log.info summary.collect { k,v -> "${k.padRight(15)}: $v" }.join("\n")
 log.info "========================================="
