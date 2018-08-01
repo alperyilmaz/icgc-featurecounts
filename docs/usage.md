@@ -51,9 +51,9 @@ Use this parameter to choose a configuration profile. Each profile is designed f
 * `docker`
     * A generic configuration profile to be used with [Docker](http://docker.com/)
     * Runs using the `local` executor and pulls software from dockerhub: [`icgc-featurecounts`](http://hub.docker.com/r/icgc-featurecounts/)
-* `aws`
-    * A starter configuration for running the pipeline on Amazon Web Services. Uses docker and Spark.
-    * See [`docs/configuration/aws.md`](configuration/aws.md)
+* `awsbatch`
+    * A configuration to utilize the pipeline on AWSBatch with Docker
+    * Please specify `params.awsqueue`, `params.awsregion`, `params.workDir` and `params.outdir` accordingly
 * `standard`
     * The default profile, used if `-profile` is not specified at all. Runs locally and expects all software to be installed and available on the `PATH`.
     * This profile is mainly designed to be used as a starting point for other configurations and is inherited by most of the other profiles.
@@ -86,6 +86,27 @@ The pipeline requires you to specify your [ICGC AWS Accesstoken](http://docs.icg
 ```bash
 --accesstoken 'abccaa7-ab30437a-49230a'
 ```
+
+## AWS Batch specific configuration parameters
+
+Note that you need to specify at least the JobQueue as the AWS Region is already prefilled with a default value. Furthermore, make sure to define `params.workDir` and `params.outdir` for storing temporary files and your results on S3. 
+
+### `--awsregion`
+
+Specify the required AWS Region to run AWSBatch on. Default is `us-east-1` (as ICGC data is solely available there for now), but in future this might help running on different AWS regions. 
+
+```bash
+--awsregion 'us-east-1'
+```
+
+### `--awsqueue`
+
+Specify the required AWSBatch JobQueue you created when setting up the pipeline here.
+
+```bash
+--awsqueue 'MyFancyProjectJobQueue' 
+```
+
 
 
 ## Job Resources
