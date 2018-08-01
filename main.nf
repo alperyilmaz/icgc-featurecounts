@@ -114,6 +114,7 @@ summary['Pipeline Version'] = params.version
 summary['Run Name']     = custom_runName ?: workflow.runName
 summary['Manifest']     = params.manifest
 summary['GTF']          = params.gtf
+summary['ICGC Accesstoken'] = params.accesstoken.split('-')[0]
 summary['Max Memory']   = params.max_memory
 summary['Max CPUs']     = params.max_cpus
 summary['Max Time']     = params.max_time
