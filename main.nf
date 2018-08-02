@@ -38,11 +38,12 @@ def helpMessage() {
       AWSBatch:
       --awsqueue                    The AWSBatch Queue to use for running this pipeline
       --awsregion                   The AWSBatch Region to use for this (default: us-east-1)
-      --workDir                     URL to S3 Storage Bucket for temporary work files. (default: ./work)
+
 
 
     Other options:
       --outdir                      The output directory where the results will be saved. Must be an S3 bucket on AWS Region used by ICGC (Virginia).
+      --workDir                     URL to S3 Storage Bucket for temporary work files. (default: ./work)
       --email                       Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits
       -name                         Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
     """.stripIndent()
@@ -99,6 +100,11 @@ if( params.gtf ){
 custom_runName = params.name
 if( !(workflow.runName ==~ /[a-z]+_[a-z]+/) ){
   custom_runName = workflow.runName
+}
+
+//AWSBatch sanity checking
+if(workflow.profile == 'awsbatch'){
+    if (!params.awsqueue || !params.awsregion || !params.workDir.startsWith('s3') || !params.outdir.startsWith('s3')) exit 1, "Specify AWS Batch required parameters!"
 }
 
 
